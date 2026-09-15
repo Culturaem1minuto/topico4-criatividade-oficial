@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRIATIVIDADE É PROCESSO, NÃO FAÍSCA</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF8F5;
+  --ink:#11100F;
+  --ink-2:#241814;
+  --terracota:#FF4D1A;
+  --sage:#6B8F71;
+  --line:#E8DDD3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--paper);color:var(--ink);overflow:hidden;height:100vh;width:100vw}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* Progress fio */
+.fio-container{position:fixed;top:0;left:0;width:100%;height:4px;z-index:100;background:rgba(0,0,0,.06)}
+.fio-progress{height:100%;background:var(--terracota);width:0%;transition:width .6s cubic-bezier(.77,0,.175,1)}
+.fio-svg{position:fixed;bottom:24px;left:24px;right:24px;height:48px;z-index:100;pointer-events:none;opacity:.9}
+.fio-label{position:fixed;bottom:18px;left:28px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(0,0,0,.5);z-index:101}
+
+/* Deck */
+.deck{position:relative;width:100%;height:100vh}
+.slide{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;transform:translateY(20px);transition:all .7s cubic-bezier(.77,0,.175,1);display:flex;overflow:hidden}
+.slide.active{opacity:1;pointer-events:auto;transform:translateY(0)}
+
+.nav{position:fixed;top:20px;right:20px;z-index:200;display:flex;gap:8px;align-items:center}
+.nav button{width:44px;height:44px;border-radius:50%;border:1px solid var(--ink);background:var(--paper);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+.nav button:hover{background:var(--ink);color:var(--paper)}
+.nav .count{font-family:'IBM Plex Mono';font-size:12px;margin:0 8px;letter-spacing:.1em}
+.dots{position:fixed;left:28px;top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:10px}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.15);transition:.3s;cursor:pointer}
+.dot.active{width:28px;border-radius:3px;background:var(--terracota)}
+
+h1,h2{line-height:.9;letter-spacing:-.04em}
+.big{font-size:clamp(48px,9vw,128px);font-weight:700}
+.medium{font-size:clamp(32px,5vw,64px);font-weight:700}
+.tag{display:inline-block;border:1px solid var(--ink);padding:4px 10px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+
+/* Slide specific */
+.s1{background:var(--paper);display:grid;grid-template-columns:1.1fr .9fr}
+.s1-left{padding:6vw 4vw 6vw 6vw;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--line)}
+.s1-right{position:relative;background:#111;overflow:hidden}
+.s1-right img{width:100%;height:100%;object-fit:cover;opacity:.9;filter:contrast(1.05)}
+.s1-line{position:absolute;left:0;right:0;top:55%;height:2px;background:repeating-linear-gradient(90deg,var(--terracota) 0 12px,transparent 12px 20px);opacity:.8}
+
+.s2{background:var(--ink);color:var(--paper);display:grid;grid-template-columns:.9fr 1.1fr}
+.s2-left{padding:5vw;display:flex;flex-direction:column;justify-content:center;position:relative}
+.s2-right{position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.1)}
+.s2-right img{width:100%;height:100%;object-fit:cover;opacity:.6}
+.stamp{position:absolute;font-family:'IBM Plex Mono';font-size:11px;padding:4px 8px;border:1px solid currentColor;transform:rotate(-6deg);opacity:.9}
+.stamp.s1{top:22%;left:12%;background:var(--terracota);color:white;border-color:var(--terracota);transform:rotate(-8deg)}
+.stamp.s2{top:35%;left:28%;transform:rotate(12deg);text-decoration:line-through;opacity:.5}
+.stamp.s3{top:48%;left:8%;transform:rotate(-4deg)}
+.stamp.s4{top:62%;left:32%;background:white;color:black;transform:rotate(6deg)}
+.stamp.s5{top:74%;left:14%;transform:rotate(-10deg);text-decoration:line-through;opacity:.5}
+
+.s3{background:var(--paper)}
+.s3-inner{width:100%;display:grid;grid-template-columns:420px 1fr;gap:0;height:100%}
+.s3-text{padding:5vw 3vw 5vw 5vw;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.s3-visual{padding:3vw;display:flex;align-items:center;justify-content:center;background:#FDFCF9}
+.s3-visual img{max-width:100%;max-height:75vh;object-fit:contain}
+
+.s4{background:var(--ink-2);color:var(--paper)}
+.s4-inner{width:100%;display:flex;flex-direction:column}
+.s4-top{padding:3vw 5vw 1vw;display:flex;justify-content:space-between;align-items:end;border-bottom:1px solid rgba(255,255,255,.1)}
+.s4-visual{flex:1;padding:2vw 4vw;display:flex;align-items:center;justify-content:center;background:#FDFCF9}
+.s4-visual img{max-width:90%;max-height:62vh}
+
+.s5{background:var(--paper);display:grid;grid-template-columns:1fr 420px}
+.s5-visual{position:relative;overflow:hidden;background:#111}
+.s5-visual img{width:100%;height:100%;object-fit:cover}
+.word{position:absolute;font-weight:700;letter-spacing:-.02em;color:white;text-shadow:0 2px 20px rgba(0,0,0,.6);font-size:clamp(20px,3vw,40px)}
+.s5-text{padding:4vw;display:flex;flex-direction:column;justify-content:center;gap:24px;border-left:1px solid var(--line)}
+
+.s6{background:var(--paper);display:grid;grid-template-columns:1.1fr .9fr}
+.s6-visual{position:relative;overflow:hidden}
+.s6-visual img{width:100%;height:100%;object-fit:cover}
+.s6-overlay{position:absolute;inset:20px;border:1px dashed rgba(255,255,255,.4);display:flex;align-items:start;justify-content:start;padding:12px}
+.s6-text{padding:4vw;display:flex;flex-direction:column;justify-content:center}
+
+.s7{background:var(--ink);color:var(--paper);display:grid;grid-template-columns:.9fr 1.1fr}
+.s7-left{padding:4vw;display:flex;flex-direction:column;justify-content:center}
+.s7-right{position:relative;overflow:hidden}
+.s7-right img{width:100%;height:100%;object-fit:cover;opacity:.85}
+.s7-tags{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px}
+.s7-tag{border:1px solid rgba(255,255,255,.2);padding:6px 12px;font-size:12px;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+.s7-tag::after{content:'×';opacity:.5}
+
+.s8{background:var(--paper);display:grid;grid-template-columns:1fr 1.15fr}
+.s8-left{padding:5vw;display:flex;flex-direction:column;justify-content:center}
+.s8-right{position:relative;overflow:hidden;background:var(--ink-2)}
+.s8-right img{width:100%;height:100%;object-fit:cover;opacity:.9}
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}
+.flow span{border:1px solid var(--ink);padding:6px 12px;font-size:11px;letter-spacing:.08em}
+.flow .arrow{border:none;padding:6px 2px}
+.final-list{font-size:18px;line-height:1.6;margin-top:16px;color:rgba(0,0,0,.7)}
+.final-list b{color:var(--ink)}
+
+@media(max-width:900px){
+  .s1,.s2,.s3-inner,.s5,.s6,.s7,.s8{grid-template-columns:1fr}
+  .s1-right,.s2-right,.s5-visual,.s6-visual,.s7-right,.s8-right{height:38vh}
+  .s3-text,.s5-text{border:none}
+  .dots{display:none}
+  .big{font-size:44px}
+}
+</style>
+</head>
+<body>
+
+<div class="fio-container"><div class="fio-progress" id="progress"></div></div>
+<svg class="fio-svg" viewBox="0 0 1200 48" preserveAspectRatio="none">
+  <path id="fioPath" d="M0 24 Q 150 24 300 24" stroke="#FF4D1A" stroke-width="2" fill="none" stroke-dasharray="8 8" opacity="0.9"/>
+</svg>
+<div class="fio-label mono" id="fioLabel">fio: linha →</div>
+
+<div class="nav">
+  <div class="count mono" id="count">01 / 08</div>
+  <button id="prev">←</button>
+  <button id="next">→</button>
+</div>
+<div class="dots" id="dots"></div>
+
+<div class="deck" id="deck">
+
+<!-- SLIDE 1 -->
+<section class="slide s1 active" data-fio="M0 24 L1200 24" data-label="fio: linha — começa sem direção">
+  <div class="s1-left">
+    <div class="tag mono">slide 01 / contexto educativo</div>
+    <h1 class="big">CRIATIVI<br>DADE</h1>
+    <div style="margin-top:24px;font-size:22px;line-height:1.1">
+      <div style="opacity:.6">não é uma resposta.</div>
+      <div style="font-weight:700;font-size:32px;margin-top:8px">É UM <span style="background:var(--terracota);color:white;padding:2px 8px">PROCESSO.</span></div>
+    </div>
+    <div class="mono" style="margin-top:48px;font-size:12px;line-height:1.6;max-width:360px;color:rgba(0,0,0,.6)">
+      Nada de lâmpada, cérebro ou criança desenhando.<br>
+      Uma mesa vista de cima como território de experimentação: folhas, riscos, formas, esquemas apagados, mão entrando.<br><br>
+      <b style="color:var(--ink)">A imagem deve parecer inacabada.</b>
+    </div>
+    <div style="margin-top:auto;display:flex;gap:12px;align-items:center" class="mono">
+      <div style="width:40px;height:1px;background:var(--ink)"></div>
+      <span style="font-size:10px;letter-spacing:.2em">CRIATIVIDADE É PROCESSO, NÃO FAÍSCA</span>
+    </div>
+  </div>
+  <div class="s1-right">
+    <img src="creative_workspace_flatlay.webp" alt="mesa processo inacabado">
+    <div class="s1-line"></div>
+    <div style="position:absolute;bottom:20px;left:20px;background:var(--paper);padding:8px 12px;font-size:10px" class="mono">TERRITÓRIO DE EXPERIMENTAÇÃO — FIO CONDUTOR COMEÇA AQUI</div>
+  </div>
+</section>
+
+<!-- SLIDE 2 -->
+<section class="slide s2" data-fio="M0 24 L400 24 M500 24 L520 24 M600 24 L1200 24" data-label="fio: linha interrompida — ruptura">
+  <div class="s2-left">
+    <div class="tag mono" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)">slide 02 / diagnóstico</div>
+    <h2 class="big" style="position:relative;z-index:2">CRIATIVI<br>DADE</h2>
+    <div class="stamp s1">inovação</div>
+    <div class="stamp s2">talento</div>
+    <div class="stamp s3">dom</div>
+    <div class="stamp s4">solução</div>
+    <div class="stamp s5">futuro</div>
+    <div style="margin-top:32px;font-size:20px;line-height:1.2;max-width:320px">
+      <span style="background:white;color:black;padding:2px 6px;font-weight:700">VIROU GURU</span><br><br>
+      <span style="opacity:.6;font-size:14px">Estamos tentando resolver um problema complexo com uma palavra da moda.</span>
+    </div>
+    <div style="margin-top:48px;border-top:1px solid rgba(255,255,255,.1);padding-top:16px" class="mono">
+      <div style="font-size:18px">Mas como? Para quê?</div>
+      <div style="opacity:.5;font-size:11px;margin-top:8px">Parede de post-its, fórmulas, soluções rápidas. Uma rasgada.</div>
+    </div>
+  </div>
+  <div class="s2-right">
+    <img src="buzzword_fatigue_wall.webp" alt="parede post-its">
+    <div style="position:absolute;top:20px;left:20px;background:var(--terracota);color:white;padding:6px 10px;font-size:10px" class="mono">RUPTURA VISUAL</div>
+  </div>
+</section>
+
+<!-- SLIDE 3 -->
+<section class="slide s3" data-fio="M0 24 Q150 8 300 24 Q450 40 600 24 Q750 8 900 24 Q1050 40 1200 24" data-label="fio: linha que se ramifica">
+  <div class="s3-inner">
+    <div class="s3-text">
+      <div class="tag mono">slide 03 / teorias</div>
+      <h2 class="medium">CARTOGRAFIA<br>HISTÓRICA</h2>
+      <div style="margin-top:24px;display:flex;flex-direction:column;gap:16px" class="mono">
+        <div><b>MEDNICK</b> → conexão<br><span style="opacity:.5;font-size:11px">duas linhas distantes que se conectam</span></div>
+        <div><b>GESTALT</b> → percepção<br><span style="opacity:.5;font-size:11px">forma fragmentada que se reorganiza</span></div>
+        <div><b>GUILFORD</b> → divergência<br><span style="opacity:.5;font-size:11px">várias ramificações</span></div>
+        <div><b>GARDNER</b> → domínio<br><span style="opacity:.5;font-size:11px">vários campos</span></div>
+        <div><b>MASLOW</b> → realização<br><span style="opacity:.5;font-size:11px">estrutura ascendente</span></div>
+      </div>
+      <div style="margin-top:32px;font-size:13px;line-height:1.4;opacity:.7">Abandona fotografia. Cria mapa visual do pensamento criativo. Cada teoria = um gesto gráfico diferente.</div>
+    </div>
+    <div class="s3-visual">
+      <img src="diagram_teorias.png" alt="diagrama teorias">
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4 -->
+<section class="slide s4" data-fio="M0 24 Q100 24 200 20 T400 16 T600 12 T800 10 T1000 8 T1200 6" data-label="fio: linha que cresce — ponto → rede → território">
+  <div class="s4-inner">
+    <div class="s4-top">
+      <div>
+        <div class="tag mono" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)">slide 04 / 3 níveis</div>
+        <h2 class="medium">FAZER A CRIATIVIDADE<br>CRESCER DIANTE DO ESPECTADOR</h2>
+      </div>
+      <div class="mono" style="font-size:11px;opacity:.5;text-align:right">uma única forma que se modifica<br>mais interessante que três caixas</div>
+    </div>
+    <div class="s4-visual">
+      <img src="diagram_3niveis.png" alt="3 níveis ponto rede territorio">
+    </div>
+    <div style="padding:12px 5vw;display:flex;gap:24px;border-top:1px solid rgba(255,255,255,.1)" class="mono">
+      <div style="font-size:11px"><b>01 ADQUISITIVA-FORMATIVA</b> — APRENDER — estrutura simples — ponto</div>
+      <div style="font-size:11px;opacity:.6"><b>02 ELABORATIVA</b> — EXPERIMENTAR — combinações — rede</div>
+      <div style="font-size:11px;opacity:.6"><b>03 PROJECTIVA</b> — TRANSFORMAR — alcança outros — território</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5 -->
+<section class="slide s5" data-fio="M0 24 Q100 24 200 24 M220 10 L280 38 M300 24 Q400 24 500 20 L700 30 Q900 24 1200 24" data-label="fio: linha que encontra outras">
+  <div class="s5-visual">
+    <img src="image.webp" alt="sala aula laboratorio">
+    <div class="word" style="top:18%;left:12%;background:var(--terracota);padding:4px 10px;font-size:14px">ERRAR</div>
+    <div class="word" style="top:32%;right:18%;background:white;color:black;padding:4px 10px;font-size:14px">TENTAR</div>
+    <div class="word" style="bottom:28%;left:20%;border:1px solid white;padding:4px 10px">DISCUTIR</div>
+    <div class="word" style="bottom:14%;right:22%;background:black;padding:4px 10px">REFAZER</div>
+  </div>
+  <div class="s5-text">
+    <div class="tag mono">slide 05 / sala de aula</div>
+    <h2 class="medium">SALA DE AULA<br>COMO<br>LABORATÓRIO</h2>
+    <div style="margin-top:12px;font-size:14px;line-height:1.5;opacity:.7">Vista de cima ou lateral, sem pose. Mostrar mãos, materiais, protótipos, desenhos, tentativa, erro, discussão. Evitar alunos olhando para câmera.</div>
+    <div style="margin-top:24px;padding:16px;border-left:3px solid var(--terracota);font-weight:700;font-size:18px;line-height:1.2">
+      O ERRO NÃO É O FIM DO PROCESSO.<br>É DADO PARA O PRÓXIMO PASSO.
+    </div>
+    <div class="mono" style="font-size:10px;letter-spacing:.12em;opacity:.5;margin-top:16px">LABORATÓRIO — NÃO PALCO</div>
+  </div>
+</section>
+
+<!-- SLIDE 6 -->
+<section class="slide s6" data-fio="M0 24 Q300 24 400 22 Q500 20 700 20 Q900 20 1200 20" data-label="fio: linha que é conduzida">
+  <div class="s6-text">
+    <div class="tag mono">slide 06 / professor</div>
+    <h2 class="medium">O PROFESSOR<br>COMO<br>DESIGNER</h2>
+    <div style="margin-top:16px;font-size:14px;line-height:1.5;opacity:.7">
+      O professor não aparece necessariamente ensinando. Mostrar alguém montando uma situação: rearranjando mesas, colocando objetos, desenhando esquema, criando experimento.
+    </div>
+    <div style="margin-top:24px">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em">PROFESSOR → DESENHA O CONTEXTO → ALUNO EXPERIMENTA</div>
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <div style="border:1px dashed var(--ink);padding:8px 12px;font-size:11px" class="mono">PLANTA BAIXA / ESQUEMA SOBREPOSTO</div>
+      </div>
+    </div>
+    <div style="margin-top:32px;font-weight:700;font-size:20px;line-height:1.2">o professor desenha o ambiente onde o pensamento acontece.</div>
+  </div>
+  <div class="s6-visual">
+    <img src="teacher_designer_studio.webp" alt="professor designer">
+    <div class="s6-overlay">
+      <div class="mono" style="background:var(--paper);padding:6px 8px;font-size:9px">SALA 04 — LAYOUT EXPERIMENTO 03</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7 -->
+<section class="slide s7" data-fio="M0 24 L200 24 M250 24 L260 24 M300 24 L310 24 M400 24 L1200 24" data-label="fio: linha quebrada — desconstrução">
+  <div class="s7-left">
+    <div class="tag mono" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)">slide 07 / mitos</div>
+    <h2 class="medium">OS MITOS:<br>DESCONSTRUÇÃO</h2>
+    <div style="margin-top:20px;font-size:14px;line-height:1.4;opacity:.7">Estátua clássica de um “gênio” ou busto humano, porém fragmentada, cortada ou desmontada. Ao redor, etiquetas sendo retiradas.</div>
+    <div class="s7-tags mono">
+      <div class="s7-tag">DOM</div>
+      <div class="s7-tag">GÊNIO</div>
+      <div class="s7-tag">INSPIRAÇÃO</div>
+      <div class="s7-tag">TALENTO</div>
+    </div>
+    <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:16px;border-top:1px solid rgba(255,255,255,.1);padding-top:16px">
+      <div>
+        <div class="mono" style="font-size:10px;opacity:.5">VIRTUOSISMO</div>
+        <div style="font-size:13px;margin-top:6px">músico tocando perfeitamente peça conhecida</div>
+      </div>
+      <div>
+        <div class="mono" style="font-size:10px;opacity:.5">≠ CRIATIVIDADE</div>
+        <div style="font-size:13px;margin-top:6px">alguém experimentando nova combinação sonora</div>
+      </div>
+    </div>
+    <div class="mono" style="margin-top:24px;font-size:11px;opacity:.5">Domínio técnico e criação são dimensões diferentes.</div>
+  </div>
+  <div class="s7-right">
+    <img src="plaster_bust_fragments.webp" alt="busto fragmentado">
+  </div>
+</section>
+
+<!-- SLIDE 8 -->
+<section class="slide s8" data-fio="M0 24 C200 24 250 8 400 12 S600 28 800 24 S1000 10 1200 14" data-label="fio: linha transformada em rede">
+  <div class="s8-left">
+    <div class="tag mono">slide 08 / conclusão</div>
+    <h2 class="big" style="font-size:clamp(36px,4.5vw,64px)">CRIATIVIDADE<br>NÃO É UMA<br><span style="background:var(--terracota);color:white;padding:0 8px">FAÍSCA.</span><br>É UMA<br>PRÁTICA.</h2>
+    <div class="flow mono">
+      <span>indivíduo</span><span class="arrow">→</span><span>conhecimento</span><span class="arrow">→</span><span>grupo</span><span class="arrow">→</span><span>escola</span><span class="arrow">→</span><span style="background:var(--ink);color:white">sociedade</span>
+    </div>
+    <div class="final-list mono">
+      <b>Aprender.</b><br>
+      <b>Experimentar.</b><br>
+      <b>Errar.</b><br>
+      <b>Recomeçar.</b><br>
+      <b>Transformar.</b>
+    </div>
+    <div style="margin-top:32px;font-size:12px;line-height:1.5;opacity:.6">A linha que começou como rabisco no Slide 1 agora virou rede. Não ilustrar literalmente. Traduzir visualmente os conceitos com processo, gesto, conexão, ruptura, tentativa, erro, reorganização e transformação.</div>
+  </div>
+  <div class="s8-right">
+    <img src="image_1.webp" alt="rede final">
+    <div style="position:absolute;bottom:20px;left:20px;right:20px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:white;padding:12px 16px" class="mono">
+      <div style="font-size:11px;letter-spacing:.1em">DIRETRIZ PRINCIPAL PARA O DESIGNER</div>
+      <div style="font-size:12px;margin-top:6px;line-height:1.4;opacity:.9">A apresentação deve começar com uma ideia ainda sem forma e terminar com uma rede capaz de transformar o entorno.</div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const dotsEl=document.getElementById('dots');
+const countEl=document.getElementById('count');
+const progressEl=document.getElementById('progress');
+const fioPath=document.getElementById('fioPath');
+const fioLabel=document.getElementById('fioLabel');
+let cur=0;
+
+slides.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>go(i);
+  dotsEl.appendChild(d);
+});
+
+function updateFio(){
+  const s=slides[cur];
+  const d=s.dataset.fio;
+  const label=s.dataset.label;
+  fioPath.setAttribute('d',d);
+  fioLabel.textContent=label;
+}
+
+function go(n){
+  cur=Math.max(0,Math.min(n,slides.length-1));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===cur));
+  [...dotsEl.children].forEach((d,i)=>d.classList.toggle('active',i===cur));
+  countEl.textContent=String(cur+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+  progressEl.style.width=((cur+1)/slides.length*100)+'%';
+  updateFio();
+}
+document.getElementById('next').onclick=()=>go(cur+1);
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ')go(cur+1);
+  if(e.key==='ArrowLeft')go(cur-1);
+});
+let startX=0;
+document.addEventListener('touchstart',e=>startX=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(dx<-40)go(cur+1);
+  if(dx>40)go(cur-1);
+});
+updateFio();
+</script>
+</body>
+</html>
